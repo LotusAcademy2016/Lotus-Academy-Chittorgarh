@@ -15,10 +15,10 @@
 // ============================================================
 
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY_HERE",
-  authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  appId: "PASTE_YOUR_APP_ID",
+  apiKey: "AIzaSyDlJk6-2I5OB_F8UXth8VM9_ZaHS2Yeeho",
+  authDomain: "lotus-academy-2e94a.firebaseapp.com",
+  projectId: "lotus-academy-2e94a",
+  appId: "1:35242275320:web:438c5ac27d4e57a4e6260d",
 };
 
 // This is just a fixed "username" behind the scenes so you only
@@ -28,8 +28,8 @@ const firebaseConfig = {
 const ADMIN_EMAIL = "admin@lotusacademy.local";
 
 // From Cloudinary → Settings → Upload → your unsigned upload preset.
-const CLOUDINARY_CLOUD_NAME = "PASTE_YOUR_CLOUDINARY_CLOUD_NAME";
-const CLOUDINARY_UPLOAD_PRESET = "PASTE_YOUR_UPLOAD_PRESET_NAME";
+const CLOUDINARY_CLOUD_NAME = "quzdj87d";
+const CLOUDINARY_UPLOAD_PRESET = "e2b92jlc";
 
 // ------------------------------------------------------------
 // Below this line, nothing needs to be edited.
