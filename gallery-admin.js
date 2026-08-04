@@ -123,8 +123,9 @@ function showLoginModal() {
       await auth.signInWithEmailAndPassword(ADMIN_EMAIL, pw);
       close();
     } catch (e) {
-      document.getElementById("adminPwError").style.display = "block";
-    }
+  console.log(e);
+  alert(e.code + " : " + e.message);
+}
   };
   document.getElementById("adminPwSubmit").onclick = submit;
   document.getElementById("adminPwInput").addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
