@@ -123,8 +123,8 @@ function showLoginModal() {
       await auth.signInWithEmailAndPassword(ADMIN_EMAIL, pw);
       close();
     } catch (e) {
-  console.log(e);
-  alert(e.code + " : " + e.message);
+  console.error(e);
+  alert(e.code + "\n" + e.message);
 }
   };
   document.getElementById("adminPwSubmit").onclick = submit;
