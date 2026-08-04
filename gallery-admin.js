@@ -29,7 +29,7 @@ const ADMIN_EMAIL = "admin@lotusacademy.local";
 
 // From Cloudinary → Settings → Upload → your unsigned upload preset.
 const CLOUDINARY_CLOUD_NAME = "quzdj87d";
-const CLOUDINARY_UPLOAD_PRESET = "ml_default";
+const CLOUDINARY_UPLOAD_PRESET = "e2b92jlc";
 
 // ------------------------------------------------------------
 // Below this line, nothing needs to be edited.
