@@ -145,7 +145,22 @@ function setupAlbum(albumEl) {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
-    input.onchange = () => { if (input.files[0]) uploadPhoto(albumId, grid, addTile, input.files[0]); };
+    input.multiple = true;
+   input.onchange = async () => {
+    if (!input.files.length) return;
+
+    
+
+    try {
+        await Promise.all(
+            [...input.files].map(file =>
+                uploadPhoto(albumId, grid, addTile, file)
+            )
+        );
+    } finally {
+       
+    }
+};
     input.click();
   });
   grid.appendChild(addTile);
