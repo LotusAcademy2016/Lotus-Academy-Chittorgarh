@@ -581,7 +581,7 @@ body.is-admin .delete-btn{display:flex;}
     position: relative;
   }
 
-  /* Hamburger button */
+  /* Hamburger */
   .site-header .menu-toggle {
     display: flex !important;
     align-items: center;
@@ -590,12 +590,15 @@ body.is-admin .delete-btn{display:flex;}
     height: 44px;
     margin-left: auto;
     padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--royal-deep);
     font-size: 24px;
     cursor: pointer;
     z-index: 10002;
   }
 
-  /* Dropdown */
+  /* RIGHT SIDE DROPDOWN */
   .site-header .main-nav {
     display: none !important;
 
@@ -610,64 +613,51 @@ body.is-admin .delete-btn{display:flex;}
     align-items: stretch;
     gap: 3px;
 
-   padding: 10px;
+    padding: 10px;
 
-background: #f7f0e5 !important;
-opacity: 1 !important;
-backdrop-filter: none !important;
--webkit-backdrop-filter: none !important;
+    /* OPAQUE WEBSITE-MATCHING BACKGROUND */
+    background: var(--paper) !important;
+    background-color: var(--paper) !important;
+    opacity: 1 !important;
 
-border: 1px solid rgba(91, 62, 45, 0.18);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    border: 1px solid var(--line);
     border-radius: 14px;
 
-    box-shadow: 0 12px 30px rgba(55, 35, 20, 0.18);
+    box-shadow: 0 12px 30px rgba(14, 47, 87, 0.25);
 
     z-index: 10001;
   }
 
-  /* When opened */
+  /* OPEN MENU */
   .site-header .main-nav.open {
-  display: flex !important;
-  background: #f7f0e5 !important;
-  opacity: 1 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
+    display: flex !important;
+    background: var(--paper) !important;
+    background-color: var(--paper) !important;
+    opacity: 1 !important;
   }
 
-  /* Links */
+  /* MENU LINKS */
   .site-header .main-nav a {
     width: 100%;
     padding: 11px 14px;
     text-align: left;
     border-radius: 9px;
     white-space: nowrap;
+    background: transparent;
   }
 
   .site-header .main-nav a:hover {
-    background: rgba(91, 62, 45, 0.08);
+    background: var(--paper-deep);
   }
 
-  /* Phone */
+  /* PHONE BUTTON */
   .site-header .main-nav .call-btn {
+    display: inline-flex !important;
     width: 100%;
     justify-content: flex-start;
     margin-top: 3px;
-  }
-}
-
-@media (max-width: 860px) {
-  .site-header .main-nav,
-  .site-header .main-nav.open {
-    background: #f7f0e5 !important;
-    background-color: #f7f0e5 !important;
-    opacity: 1 !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: 0 12px 30px rgba(55, 35, 20, 0.25) !important;
-  }
-
-  .site-header .main-nav a {
-    background: #f7f0e5 !important;
   }
 }
