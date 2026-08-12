@@ -715,3 +715,9 @@ body.is-admin .delete-btn{display:flex;}
     display: inline-flex !important;
   }
 }
+@media (max-width: 860px) {
+  .site-header .main-nav .call-btn {
+    color: var(--royal-deep) !important;
+    background: transparent !important;
+  }
+}
