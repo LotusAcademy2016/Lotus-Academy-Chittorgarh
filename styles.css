@@ -572,3 +572,52 @@ body.is-admin .delete-btn{display:flex;}
   }
 
 }
+
+/* ===== MOBILE NAV FIX ===== */
+
+@media (max-width: 860px) {
+
+  .site-header .header-inner {
+    position: relative;
+    min-height: 64px;
+  }
+
+  .site-header .main-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 12px 18px 18px;
+    background: var(--paper);
+    box-shadow: 0 12px 25px rgba(0,0,0,.12);
+    z-index: 9999;
+  }
+
+  .site-header .main-nav.open {
+    display: flex;
+  }
+
+  .site-header .main-nav a {
+    width: 100%;
+    padding: 12px 10px;
+    text-align: center;
+  }
+
+  .site-header .main-nav .call-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 6px;
+  }
+
+  .site-header .menu-toggle {
+    display: block;
+    margin-left: auto;
+    z-index: 10000;
+  }
+
+}
