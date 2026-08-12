@@ -662,20 +662,82 @@ body.is-admin .delete-btn{display:flex;}
     z-index: 10000;
   }
 
-  /* SHOW NAV AFTER ☰ CLICK */
+/* ===== MOBILE NAV — RIGHT DROPDOWN ===== */
+
+@media (max-width: 860px) {
+
+  .site-header .header-inner {
+    position: relative;
+    min-height: 64px;
+  }
+
+  /* Hamburger */
+  .site-header .menu-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    padding: 0;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10002;
+  }
+
+  /* Closed menu */
+  .site-header .main-nav {
+    display: none !important;
+
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 18px;
+    left: auto;
+
+    width: 220px;
+
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+
+    padding: 10px;
+
+    /* Solid background — no transparency */
+    background: #f7f0e5;
+
+    border: 1px solid rgba(91, 62, 45, 0.18);
+    border-radius: 14px;
+
+    box-shadow: 0 12px 30px rgba(55, 35, 20, 0.18);
+
+    z-index: 10001;
+  }
+
+  /* Open menu */
   .site-header .main-nav.open {
     display: flex !important;
   }
 
+  /* Menu items */
   .site-header .main-nav a {
     width: 100%;
-    padding: 13px 10px;
-    text-align: center;
+    padding: 11px 14px;
+
+    text-align: left;
+
+    border-radius: 9px;
+    white-space: nowrap;
   }
 
+  /* Hover/tap effect */
+  .site-header .main-nav a:hover {
+    background: rgba(91, 62, 45, 0.08);
+  }
+
+  /* Phone button */
   .site-header .main-nav .call-btn {
     width: 100%;
-    justify-content: center;
-    margin-top: 5px;
+    justify-content: flex-start;
+    margin-top: 3px;
   }
 }
