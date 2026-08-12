@@ -573,105 +573,15 @@ body.is-admin .delete-btn{display:flex;}
 
 }
 
-/* ===== MOBILE NAV FIX ===== */
-
-@media (max-width: 860px) {
-
-  .site-header .header-inner {
-    position: relative;
-    min-height: 64px;
-  }
-
-  .site-header .main-nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    padding: 12px 18px 18px;
-    background: var(--paper);
-    box-shadow: 0 12px 25px rgba(0,0,0,.12);
-    z-index: 9999;
-  }
-
-  .site-header .main-nav.open {
-    display: flex;
-  }
-
-  .site-header .main-nav a {
-    width: 100%;
-    padding: 12px 10px;
-    text-align: center;
-  }
-
-  .site-header .main-nav .call-btn {
-    width: 100%;
-    justify-content: center;
-    margin-top: 6px;
-  }
-
-  .site-header .menu-toggle {
-    display: block;
-    margin-left: auto;
-    z-index: 10000;
-  }
-
-}
-
-/* ===== FINAL MOBILE NAV FIX ===== */
-
-@media (max-width: 860px) {
-
-  .site-header .header-inner {
-    position: relative;
-    min-height: 64px;
-  }
-
-  /* SHOW HAMBURGER */
-  .site-header .menu-toggle {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    margin-left: auto;
-    padding: 0;
-    font-size: 24px;
-    cursor: pointer;
-    z-index: 10001;
-  }
-
-  /* HIDE NAV UNTIL MENU IS OPEN */
-  .site-header .main-nav {
-    display: none !important;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    padding: 10px 18px 18px;
-    background: var(--paper);
-    box-shadow: 0 12px 25px rgba(0,0,0,.15);
-    z-index: 10000;
-  }
-
 /* ===== MOBILE NAV — RIGHT DROPDOWN ===== */
 
 @media (max-width: 860px) {
 
   .site-header .header-inner {
     position: relative;
-    min-height: 64px;
   }
 
-  /* Hamburger */
+  /* Hamburger button */
   .site-header .menu-toggle {
     display: flex !important;
     align-items: center;
@@ -685,7 +595,7 @@ body.is-admin .delete-btn{display:flex;}
     z-index: 10002;
   }
 
-  /* Closed menu */
+  /* Dropdown */
   .site-header .main-nav {
     display: none !important;
 
@@ -702,7 +612,6 @@ body.is-admin .delete-btn{display:flex;}
 
     padding: 10px;
 
-    /* Solid background — no transparency */
     background: #f7f0e5;
 
     border: 1px solid rgba(91, 62, 45, 0.18);
@@ -713,28 +622,25 @@ body.is-admin .delete-btn{display:flex;}
     z-index: 10001;
   }
 
-  /* Open menu */
+  /* When opened */
   .site-header .main-nav.open {
     display: flex !important;
   }
 
-  /* Menu items */
+  /* Links */
   .site-header .main-nav a {
     width: 100%;
     padding: 11px 14px;
-
     text-align: left;
-
     border-radius: 9px;
     white-space: nowrap;
   }
 
-  /* Hover/tap effect */
   .site-header .main-nav a:hover {
     background: rgba(91, 62, 45, 0.08);
   }
 
-  /* Phone button */
+  /* Phone */
   .site-header .main-nav .call-btn {
     width: 100%;
     justify-content: flex-start;
