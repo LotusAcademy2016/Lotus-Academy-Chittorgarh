@@ -422,3 +422,153 @@ body.is-admin .delete-btn{display:flex;}
 
 /* utility */
 .mt-0{margin-top:0;}
+
+/* =========================================================
+   MOBILE RESPONSIVE — HOME
+   ========================================================= */
+
+@media (max-width: 600px){
+
+  .wrap{
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .header-inner{
+    padding:10px 18px;
+  }
+
+  .brand img{
+    width:44px;
+    height:44px;
+  }
+
+  .brand .name{
+    font-size:1.05rem;
+  }
+
+  .brand .name small{
+    font-size:.55rem;
+  }
+
+  /* Hero */
+  .hero{
+    padding:45px 0 35px;
+  }
+
+  .hero-inner{
+    gap:35px;
+  }
+
+  .hero h1{
+    font-size:2.15rem;
+    line-height:1.1;
+  }
+
+  .hero .lede{
+    font-size:.95rem;
+  }
+
+  .hero-badges{
+    gap:8px;
+    margin:18px 0 22px;
+  }
+
+  .badge{
+    padding:7px 11px;
+    font-size:.72rem;
+  }
+
+  .hero-cta{
+    flex-direction:column;
+    width:100%;
+  }
+
+  .hero-cta .btn{
+    width:100%;
+    justify-content:center;
+  }
+
+  .sunburst{
+    width:450px;
+    height:450px;
+    top:-30px;
+  }
+
+  .crest-stage{
+    max-width:235px;
+  }
+
+  .crest-mini{
+    width:38%;
+  }
+
+  /* Sections */
+  .section{
+    padding:55px 0;
+  }
+
+  .section-head{
+    margin-bottom:30px;
+  }
+
+  .lede{
+    font-size:.95rem;
+  }
+
+  /* Stats */
+  .stat-strip{
+    padding:28px 0;
+  }
+
+  .stat-grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:22px 10px;
+  }
+
+  .stat-grid .num{
+    font-size:1.8rem;
+  }
+
+  .stat-grid .lbl{
+    font-size:.65rem;
+  }
+
+  /* About split */
+  .split{
+    grid-template-columns:1fr;
+    gap:30px;
+  }
+
+  /* Quote */
+  .quote-block{
+    padding:30px 22px;
+    border-radius:18px;
+  }
+
+  .quote-block p{
+    font-size:1.05rem;
+  }
+
+  /* Cards */
+  .grid-cards{
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+
+  /* Footer */
+  footer{
+    padding:45px 0 22px;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr;
+    gap:28px;
+    text-align:center;
+  }
+
+  .foot-brand{
+    justify-content:center;
+  }
+
+}
