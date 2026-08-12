@@ -651,3 +651,67 @@ body.is-admin .delete-btn{display:flex;}
     margin-top: 3px;
   }
 }
+
+@media (max-width: 860px) {
+  .site-header {
+    position: sticky !important;
+    z-index: 99999 !important;
+  }
+
+  .site-header .header-inner {
+    position: relative !important;
+  }
+
+  .site-header .menu-toggle {
+    display: flex !important;
+    position: relative !important;
+    z-index: 100001 !important;
+  }
+
+  .site-header .main-nav {
+    display: none !important;
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    right: 18px !important;
+    left: auto !important;
+    width: 220px !important;
+
+    padding: 10px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 3px !important;
+
+    background: #FBF3E7 !important;
+    background-color: #FBF3E7 !important;
+    opacity: 1 !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    border: 1px solid rgba(14,47,87,.14) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 30px rgba(14,47,87,.25) !important;
+
+    transform: none !important;
+    z-index: 100000 !important;
+  }
+
+  .site-header .main-nav.open {
+    display: flex !important;
+    transform: none !important;
+    background: #FBF3E7 !important;
+    background-color: #FBF3E7 !important;
+    opacity: 1 !important;
+  }
+
+  .site-header .main-nav a {
+    display: block !important;
+    width: 100% !important;
+    background: #FBF3E7 !important;
+    padding: 11px 14px !important;
+  }
+
+  .site-header .main-nav .call-btn {
+    display: inline-flex !important;
+  }
+}
