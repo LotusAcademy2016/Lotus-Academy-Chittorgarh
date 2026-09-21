@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lotus Academy | School Calendar 2026-2027</title>
+<meta name="description" content="Lotus Academy official school calendar — events, holidays, exams and activities for the 2026-2027 academic year.">
+
+<!-- Firebase (used only to READ admin-added events/vacations — see admin.html for the write side) -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+/* ============================================================
+   LOTUS ACADEMY — SCHOOL CALENDAR
+   Single-file production stylesheet
+   Sections: Reset, Tokens, Base, Header, Nav, Layout,
+             Calendar grid, Cards, Gallery, Footer, Themes,
+             Animations, Responsive
+   ============================================================ */
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+  background: #f7f4ee;
+  color: #23262b;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; border: none; background: none; }
+ul { list-style: none; }
+h1, h2, h3, h4 { font-family: 'Trebuchet MS', 'Segoe UI', Verdana, sans-serif; font-weight: 700; letter-spacing: 0.01em; }
+
+/* ---------- Design tokens ---------- */
+:root {
+  --ink: #23262b;
+  --paper: #f7f4ee;
+  --card: #ffffff;
+  --line: #e4ded1;
+  --gold: #b8862f;
+  --shadow: 0 10px 30px rgba(20, 20, 30, 0.08);
+  --shadow-lg: 0 18px 45px rgba(20, 20, 30, 0.14);
+  --radius: 18px;
+
+  /* Fixed event-type colors — consistent across every month */
+  --c-holiday: #d13b3b;   /* red    — official / vacation / emergency holiday, Sundays */
+  --c-exam:    #2e8b52;   /* green  — exams */
+  --c-activity:#8e3fb0;   /* purple — activities */
+  --c-event:   #2668c4;   /* blue   — special school events */
+  --c-reminder:#e08a20;   /* orange — important reminders */
+}
+
+/* ---------- Skip link (accessibility) ---------- */
+.skip-link {
+  position: absolute; left: -999px; top: 0; z-index: 999;
+  background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 0 0 8px 0;
+}
+.skip-link:focus { left: 0; }
+
+/* ---------- Focus visibility ---------- */
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--gold); outline-offset: 3px;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.site-header {
+  background: linear-gradient(135deg, #1c2430 0%, #2b3648 100%);
+  color: #f4f1e8;
+  padding: 28px 5vw;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+.site-header::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 85% 20%, rgba(184,134,47,0.25), transparent 55%);
+  pointer-events: none;
+}
+.school-logo {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--gold);
+  background: #fff;
+  flex-shrink: 0;
+  animation: fadeIn 0.9s ease both;
+}
+.school-identity { flex: 1 1 260px; animation: slideUp 0.9s ease both; }
+.school-identity h1 {
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+.school-identity .school-tagline {
+  color: var(--gold);
+  font-size: 0.95rem;
+  font-style: italic;
+  margin-top: 4px;
+}
+.school-contact {
+  display: flex; flex-wrap: wrap; gap: 10px 22px;
+  font-size: 0.85rem;
+  color: #d8d3c4;
+  margin-top: 12px;
+}
+.school-contact span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.school-contact svg { width: 15px; height: 15px; fill: var(--gold); flex-shrink: 0; }
+
+/* ============================================================
+   STICKY NAVIGATION
+   ============================================================ */
+.calendar-nav {
+  position: sticky; top: 0; z-index: 500;
+  background: rgba(247, 244, 238, 0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+.nav-inner {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 4vw;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.nav-inner::-webkit-scrollbar { height: 5px; }
+.nav-inner::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
+.nav-pill {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-weight: 600;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.nav-pill:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+.nav-pill[aria-current="true"] {
+  background: var(--ink); color: #fff; border-color: var(--ink);
+}
+.nav-arrow { flex-shrink: 0; font-size: 1.1rem; padding: 8px 10px; color: var(--gold); }
+
+/* ============================================================
+   MAIN LAYOUT
+   ============================================================ */
+main { max-width: 1180px; margin: 0 auto; padding: 0 4vw; }
+
+.month-section {
+  position: relative;
+  margin: 60px 0;
+  padding: 42px clamp(16px, 4vw, 42px);
+  border-radius: 28px;
+  overflow: hidden;
+  scroll-margin-top: 70px;
+  background: linear-gradient(160deg, var(--m-bg1), var(--m-bg2));
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* decorative floating shapes (theme accent + emoji) */
+.deco {
+  position: absolute;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  opacity: 0.22;
+  pointer-events: none;
+  animation: floaty 7s ease-in-out infinite;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.08));
+}
+.deco.d1 { top: 6%; right: 6%; animation-delay: 0s; }
+.deco.d2 { bottom: 10%; left: 4%; font-size: clamp(1.8rem, 4vw, 3rem); animation-delay: 1.4s; }
+.deco.d3 { top: 45%; right: 2%; font-size: clamp(1.4rem, 3vw, 2.2rem); animation-delay: 2.7s; }
+.deco.blob {
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.35;
+  background: radial-gradient(circle, var(--m-primary), transparent 70%);
+  width: 260px; height: 260px;
+  top: -80px; left: -80px;
+}
+
+.month-header { position: relative; z-index: 2; text-align: center; margin-bottom: 28px; }
+.month-eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--m-primary);
+  font-weight: 700;
+  margin-bottom: 6px;
+  animation: fadeIn 0.8s ease both;
+}
+.month-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--ink);
+  animation: slideUp 0.8s ease both;
+}
+.month-theme-name {
+  color: var(--m-primary);
+  font-style: italic;
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  margin-top: 4px;
+  animation: slideUp 0.9s ease both;
+}
+
+/* Prev / next / top controls per month */
+.month-controls {
+  position: relative; z-index: 2;
+  display: flex; justify-content: center; gap: 12px;
+  margin-bottom: 30px; flex-wrap: wrap;
+}
+.btn {
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  background: var(--card);
+  color: var(--m-primary);
+  border: 1.5px solid var(--m-primary);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.btn:hover { background: var(--m-primary); color: #fff; transform: translateY(-3px); box-shadow: var(--shadow); }
+
+/* ---------- Legend ---------- */
+.legend {
+  position: relative; z-index: 2;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 18px;
+  margin-bottom: 22px;
+  font-size: 0.78rem;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; color: var(--ink); }
+.dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(255,255,255,0.6) inset; }
+.dot.holiday { background: var(--c-holiday); }
+.dot.exam { background: var(--c-exam); }
+.dot.activity { background: var(--c-activity); }
+.dot.event { background: var(--c-event); }
+.dot.reminder { background: var(--c-reminder); }
+
+/* ============================================================
+   CALENDAR GRID (glassmorphism card)
+   ============================================================ */
+.calendar-card {
+  position: relative; z-index: 2;
+  background: rgba(255,255,255,0.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: var(--radius);
+  padding: 20px clamp(10px, 2vw, 26px);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+table.calendar-table { width: 100%; border-collapse: separate; border-spacing: 6px; min-width: 460px; }
+.calendar-table caption { caption-side: top; text-align: left; font-size: 0.001px; }
+.calendar-table th {
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--m-primary);
+  font-weight: 700;
+  padding: 6px 0;
+}
+.calendar-table td { text-align: center; }
+.cal-day {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-width: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 12px;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: rgba(255,255,255,0.55);
+  color: var(--ink);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: zoomIn 0.4s ease both;
+  cursor: default;
+}
+.cal-day:hover { transform: translateY(-3px) scale(1.06); box-shadow: var(--shadow); z-index: 3; }
+.cal-day.empty { background: transparent; border: none; }
+.cal-day.today { outline: 2.5px solid var(--ink); outline-offset: 2px; font-weight: 800; }
+
+.cal-day.holiday  { background: var(--c-holiday); color: #fff; }
+.cal-day.exam     { background: var(--c-exam); color: #fff; }
+.cal-day.activity { background: var(--c-activity); color: #fff; }
+.cal-day.event    { background: var(--c-event); color: #fff; }
+.cal-day.reminder { background: var(--c-reminder); color: #fff; }
+.cal-day.sunday:not(.holiday):not(.exam):not(.activity):not(.event):not(.reminder) {
+  background: rgba(209, 59, 59, 0.16); color: var(--c-holiday);
+}
+
+/* ============================================================
+   DAY INFO PANEL (click-to-view)
+   ============================================================ */
+.day-info-panel {
+  position: relative; z-index: 2;
+  margin-top: 16px;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 18px;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--m-primary);
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 0.9rem;
+  animation: fadeIn 0.4s ease both;
+  min-height: 24px;
+}
+.day-info-panel .day-info-placeholder { color: #8a8578; font-style: italic; }
+.day-info-panel .day-info-date { font-weight: 700; color: var(--ink); margin-right: 8px; }
+.day-info-panel .day-info-tag {
+  display: inline-block; margin-left: 8px; padding: 2px 10px;
+  border-radius: 999px; font-size: 0.72rem; font-weight: 700;
+  color: #fff; vertical-align: middle;
+}
+.day-info-panel .day-info-tag.holiday { background: var(--c-holiday); }
+.day-info-panel .day-info-tag.exam { background: var(--c-exam); }
+.day-info-panel .day-info-tag.activity { background: var(--c-activity); }
+.day-info-panel .day-info-tag.event { background: var(--c-event); }
+.day-info-panel .day-info-tag.reminder { background: var(--c-reminder); }
+.day-info-panel .day-info-tag.sunday { background: var(--c-holiday); }
+.day-info-panel .day-info-tag.none { background: #9a9585; }
+.day-info-panel .day-info-desc { margin-top: 8px; color: #4a4d54; font-style: italic; line-height: 1.5; }
+.cal-day.selected { outline: 2.5px solid var(--m-primary); outline-offset: 2px; box-shadow: var(--shadow-lg); }
+
+/* ============================================================
+   INFO CARDS (Co-curricular / Notice / Principal / Quote)
+   ============================================================ */
+.info-grid {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 22px;
+  margin-top: 32px;
+}
+.info-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 26px;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--m-primary);
+  animation: slideUp 0.7s ease both;
+}
+.info-card h3 {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--m-primary);
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+}
+.info-card p { font-size: 0.92rem; color: #3c4048; margin-bottom: 10px; }
+.info-card ul { padding-left: 4px; }
+.info-card ul li {
+  font-size: 0.9rem; color: #3c4048;
+  padding-left: 20px; position: relative; margin-bottom: 8px;
+}
+.info-card ul li::before {
+  content: "✦"; position: absolute; left: 0; color: var(--m-primary); font-size: 0.8rem;
+}
+.notice-card { background: repeating-linear-gradient(135deg, #fffdf7, #fffdf7 12px, #fbf6e8 12px, #fbf6e8 24px); }
+.notice-card h3::before { content: "📌"; }
+.principal-card h3::before { content: "🖋️"; }
+.cocurricular-card h3::before { content: "🎯"; }
+.highlight-box {
+  margin-top: 12px; padding: 12px 14px;
+  background: rgba(184,134,47,0.1);
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Principal signature block */
+.principal-sign { margin-top: 14px; font-family: Georgia, serif; font-style: italic; color: var(--m-primary); }
+
+/* Quote */
+.quote-block {
+  position: relative; z-index: 2;
+  text-align: center;
+  margin: 36px auto 0;
+  max-width: 640px;
+  padding: 26px 20px;
+  animation: fadeIn 1s ease both;
+}
+.quote-block p.quote-text {
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  font-style: italic;
+  color: var(--ink);
+  position: relative;
+}
+.quote-block p.quote-text::before { content: "“"; color: var(--m-primary); font-size: 1.6em; margin-right: 4px; }
+.quote-block p.quote-text::after { content: "”"; color: var(--m-primary); font-size: 1.6em; margin-left: 4px; }
+.quote-block .quote-source { margin-top: 10px; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--m-primary); font-family: 'Trebuchet MS', sans-serif; }
+
+/* ============================================================
+   GALLERY
+   ============================================================ */
+.gallery-heading {
+  position: relative; z-index: 2;
+  text-align: center; margin-top: 40px;
+  font-size: 1.15rem; color: var(--ink);
+}
+.gallery-heading span { color: var(--m-primary); }
+.gallery-grid {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 18px;
+}
+.gallery-item {
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  box-shadow: var(--shadow);
+  position: relative;
+  background: rgba(255,255,255,0.4);
+}
+.gallery-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.55s ease, filter 0.55s ease;
+}
+.gallery-item:hover img { transform: scale(1.12); filter: brightness(1.05); }
+.gallery-item::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.35), transparent 50%);
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.gallery-item:hover::after { opacity: 1; }
+
+/* ============================================================
+   VACATION BANNER
+   ============================================================ */
+.vacation-banner {
+  position: relative; z-index: 2;
+  margin-top: 22px;
+  background: rgba(209,59,59,0.08);
+  border: 1.5px dashed var(--c-holiday);
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 0.86rem;
+  color: #7a1f1f;
+  text-align: center;
+  display: none;
+}
+.vacation-banner.show { display: block; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer {
+  background: #1c2430;
+  color: #d8d3c4;
+  margin-top: 60px;
+  padding: 46px 5vw 26px;
+}
+.footer-grid {
+  max-width: 1180px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.footer-brand { display: flex; align-items: center; gap: 14px; }
+.footer-brand img { width: 54px; height: 54px; border-radius: 50%; border: 2px solid var(--gold); }
+.footer-brand h4 { color: #fff; font-size: 1.15rem; letter-spacing: 0.05em; }
+.footer-col h5 { color: var(--gold); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+.footer-col p, .footer-col a { display: block; font-size: 0.86rem; margin-bottom: 8px; color: #c9c4b4; transition: color 0.2s ease; }
+.footer-col a:hover { color: var(--gold); }
+.social-icons { display: flex; gap: 12px; margin-top: 4px; }
+.social-icons a {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+.social-icons a:hover { background: var(--gold); transform: translateY(-3px); }
+.social-icons svg { width: 17px; height: 17px; fill: #fff; }
+.footer-bottom { max-width: 1180px; margin: 20px auto 0; text-align: center; font-size: 0.78rem; color: #9b968a; }
+
+/* ============================================================
+   GO TO TOP
+   ============================================================ */
+.go-top {
+  position: fixed; bottom: 26px; right: 22px; z-index: 600;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--ink); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: var(--shadow-lg);
+  opacity: 0; visibility: hidden; transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+.go-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+.go-top:hover { background: var(--gold); transform: translateY(-4px); }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+@keyframes floaty { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-16px) rotate(6deg); } }
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
+/* ============================================================
+   MONTH THEMES — color tokens per season/festival
+   ============================================================ */
+[data-theme="monsoon"]      { --m-primary:#1b5b6e; --m-secondary:#4a90a4; --m-bg1:#eaf5f6; --m-bg2:#d7e9ec; }
+[data-theme="independence"] { --m-primary:#c8631a; --m-secondary:#138808; --m-bg1:#fff4e4; --m-bg2:#e9f7e6; }
+[data-theme="teachers"]     { --m-primary:#a1721f; --m-secondary:#8b4513; --m-bg1:#fbf1dd; --m-bg2:#f3e4c4; }
+[data-theme="dussehra"]     { --m-primary:#9a1f1f; --m-secondary:#c98a1a; --m-bg1:#fdece4; --m-bg2:#f8dcc9; }
+[data-theme="diwali"]       { --m-primary:#7a1f6e; --m-secondary:#d68c1a; --m-bg1:#fbeee0; --m-bg2:#f1ddef; }
+[data-theme="christmas"]    { --m-primary:#0b5d33; --m-secondary:#a3242a; --m-bg1:#eef7ee; --m-bg2:#f3e6e6; }
+[data-theme="republic"]     { --m-primary:#144a91; --m-secondary:#c8631a; --m-bg1:#eaf1fb; --m-bg2:#fdf1e2; }
+[data-theme="spring"]       { --m-primary:#c14f78; --m-secondary:#6fa03c; --m-bg1:#fdeef2; --m-bg2:#eef6e4; }
+[data-theme="holi"]         { --m-primary:#c22a6d; --m-secondary:#2f8fbf; --m-bg1:#fdeaf3; --m-bg2:#eaf6fb; }
+[data-theme="nature"]       { --m-primary:#276b3f; --m-secondary:#7a5230; --m-bg1:#eef6ec; --m-bg2:#f1ece0; }
+[data-theme="summer"]       { --m-primary:#d97c0a; --m-secondary:#e0a520; --m-bg1:#fff3dc; --m-bg2:#ffe8c2; }
+[data-theme="rainarrival"]  { --m-primary:#0f6b5c; --m-secondary:#2fa08c; --m-bg1:#e7f6f2; --m-bg2:#d9eee8; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .month-section { margin: 40px 0; padding: 32px 18px; }
+}
+@media (max-width: 600px) {
+  .site-header { padding: 22px 5vw; }
+  .school-logo { width: 56px; height: 56px; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .cal-day { font-size: 0.78rem; min-width: 32px; border-radius: 9px; }
+  table.calendar-table { border-spacing: 4px; min-width: 380px; }
+  .info-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 380px) {
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  table.calendar-table { min-width: 320px; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to calendar content</a>
+
+<!-- ============================================================
+     SCHOOL HEADER
+     ============================================================ -->
+<header class="site-header">
+  <img class="school-logo" src="images/logo.png" alt="Lotus Academy logo" loading="lazy">
+  <div class="school-identity">
+    <h1>LOTUS ACADEMY</h1>
+    <p class="school-tagline">Academic Calendar — 2026 · 2027</p>
+    <div class="school-contact">
+      <span><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg> [School Address Placeholder, City, State — PIN Code]</span>
+      <span><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.3 21 3 13.7 3 5c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.2 1L6.6 10.8z"/></svg> [+00 0000 000000]</span>
+      <span><svg viewBox="0 0 24 24"><path d="M2 4h20v16H2V4zm2 2v.01L12 13l8-6.99V6H4zm16 12V8.2l-8 7-8-7V18h16z"/></svg> [info@lotusacademy.edu.placeholder]</span>
+      <span><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.9 6h-3a15.6 15.6 0 0 0-1.4-4.2A8.03 8.03 0 0 1 18.9 8zM12 4c.9 1.3 1.6 2.7 2.1 4H9.9c.5-1.3 1.2-2.7 2.1-4zM4.3 14a7.9 7.9 0 0 1 0-4h3.4a16.6 16.6 0 0 0 0 4H4.3zm.8 2h3a15.6 15.6 0 0 0 1.4 4.2A8.03 8.03 0 0 1 5.1 16zm3-8H5.1a8.03 8.03 0 0 1 4.4-4.2A15.6 15.6 0 0 0 8.1 8zM12 20c-.9-1.3-1.6-2.7-2.1-4h4.2c-.5 1.3-1.2 2.7-2.1 4zm2.6-6H9.4a14.6 14.6 0 0 1 0-4h5.2a14.6 14.6 0 0 1 0 4zm.3 5.8c.6-1.3 1.1-2.7 1.4-4.2h3a8.03 8.03 0 0 1-4.4 4.2zm1.8-6.2a16.6 16.6 0 0 0 0-4h3.4a7.9 7.9 0 0 1 0 4h-3.4z"/></svg> www.lotusacademy.edu.placeholder</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     STICKY MONTH NAVIGATION (built by JavaScript from MONTHS data)
+     ============================================================ -->
+<nav class="calendar-nav" aria-label="Month navigation">
+  <div class="nav-inner" id="navInner"></div>
+</nav>
+
+<!-- ============================================================
+     MAIN CALENDAR CONTENT (month sections injected by JavaScript)
+     ============================================================ -->
+<main id="main-content"></main>
+
+<button class="go-top" id="goTopBtn" aria-label="Go to top of page">↑</button>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col footer-brand">
+      <img src="images/logo.png" alt="Lotus Academy logo" loading="lazy">
+      <div>
+        <h4>LOTUS ACADEMY</h4>
+        <p style="margin-top:4px;">Nurturing minds, building futures.</p>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <p>[School Address Placeholder, City, State — PIN Code]</p>
+      <p>[+00 0000 000000]</p>
+      <p>[info@lotusacademy.edu.placeholder]</p>
+    </div>
+    <div class="footer-col">
+      <h5>Quick Links</h5>
+      <a href="#">Website Home</a>
+      <a href="#">Admissions</a>
+      <a href="#">Academics</a>
+      <a href="#" id="footerTopLink">This Calendar</a>
+    </div>
+    <div class="footer-col">
+      <h5>Follow Us</h5>
+      <div class="social-icons">
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47a4.9 4.9 0 0 1 1.77 1.15 4.9 4.9 0 0 1 1.15 1.77c.25.64.42 1.37.47 2.43C21.99 8.94 22 9.3 22 12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.64.25-1.37.42-2.43.47C15.06 21.99 14.7 22 12 22s-3.06-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.25-.64-.42-1.37-.47-2.43C2.01 15.06 2 14.7 2 12s.01-3.06.06-4.12c.05-1.06.22-1.79.47-2.43a4.9 4.9 0 0 1 1.15-1.77A4.9 4.9 0 0 1 5.45.53C6.09.28 6.82.11 7.88.06 8.94.01 9.3 0 12 0zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8.2A3.2 3.2 0 1 1 12 8.8a3.2 3.2 0 0 1 0 6.4zm5.4-8.4a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"/></svg></a>
+        <a href="#" aria-label="Twitter / X"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7.4 8.5L23 22h-6.8l-5.3-6.9L4.8 22H1.7l7.9-9.1L1 2h7l4.8 6.3L18.9 2zm-1.2 18h1.9L7.4 4H5.3l12.4 16z"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23 12s0-3.4-.4-5c-.3-.9-1-1.6-1.9-1.9C19 4.7 12 4.7 12 4.7s-7 0-8.7.4c-.9.3-1.6 1-1.9 1.9C1 8.6 1 12 1 12s0 3.4.4 5c.3.9 1 1.6 1.9 1.9 1.7.4 8.7.4 8.7.4s7 0 8.7-.4c.9-.3 1.6-1 1.9-1.9.4-1.6.4-5 .4-5zM9.8 15.3V8.7l6 3.3-6 3.3z"/></svg></a>
+      </div>
+    </div>
+  </div>
+  <p class="footer-bottom">© <span id="footerYear"></span> Lotus Academy. All rights reserved. · Calendar generated for the 2026–2027 academic session.</p>
+</footer>
+
+<script>
+/* ================================================================
+   LOTUS ACADEMY CALENDAR — APPLICATION LOGIC
+   All data below is fully editable. Dates for lunar / variable
+   festivals are approximate placeholders — verify and update
+   each year (marked with UPDATE comments).
+   ================================================================ */
+(function () {
+  "use strict";
+
+  /* --------------------------------------------------------------
+     1. EDITABLE EVENT DATA
+     -------------------------------------------------------------- */
+
+  // Fixed & approximate national / festival holidays (RED) — days the
+  // SCHOOL IS CLOSED. Dates marked "approx" are lunar/variable — verify
+  // against the current year's official Panchang/govt list before publishing.
+  // NOTE: Independence Day, Republic Day, Gandhi Jayanti, Teachers' Day and
+  // Children's Day are intentionally NOT in this list — the school stays
+  // open and celebrates them, so they live in `specialEvents` (blue) instead.
+  const holidays = [
+    { date: "2026-08-28", name: "Raksha Bandhan" },
+    { date: "2026-09-04", name: "Janmashtami" },
+    { date: "2026-09-14", name: "Ganesh Chaturthi" },
+    { date: "2026-10-20", name: "Dussehra (Vijayadashami)" },
+    { date: "2026-11-08", name: "Diwali" },
+    { date: "2026-11-24", name: "Guru Nanak Jayanti" },
+    { date: "2026-12-25", name: "Christmas" },
+    { date: "2027-01-01", name: "New Year's Day" },
+    { date: "2027-01-13", name: "Lohri" },
+    { date: "2027-01-14", name: "Makar Sankranti / Pongal" },
+    { date: "2027-03-06", name: "Maha Shivratri" },
+    { date: "2027-03-22", name: "Holi" },
+    { date: "2027-03-26", name: "Good Friday" },
+    { date: "2027-03-30", name: "Ram Navami (approx — UPDATE)" },
+    { date: "2027-04-04", name: "Mahavir Jayanti (approx — UPDATE)" },
+    { date: "2027-05-01", name: "Labour Day" },
+    { date: "2027-05-20", name: "Buddha Purnima" }
+    // Eid al-Fitr / Eid al-Adha: dates vary each year — add manually, e.g.
+    // { date: "2027-03-20", name: "Eid al-Fitr (PLACEHOLDER — UPDATE)" },
+  ];
+
+  // Long vacations (RED)
+  const vacations = [
+    { name: "Winter Vacation", start: "2026-12-23", end: "2027-01-05" },
+    { name: "Summer Vacation", start: "2027-05-10", end: "2027-06-26" }
+  ];
+
+  // Diwali vacation — configurable block. Default length: 10 days.
+  const diwaliVacation = {
+    name: "Diwali Vacation",
+    start: "2026-11-05",
+    days: 10 // change this number, or set an explicit "end" date below instead
+  };
+  (function computeDiwaliEnd() {
+    const d = new Date(diwaliVacation.start + "T00:00:00");
+    d.setDate(d.getDate() + diwaliVacation.days - 1);
+    diwaliVacation.end = d.toISOString().slice(0, 10);
+  })();
+  vacations.push(diwaliVacation);
+
+  // Exam days (GREEN). Format: { date, name, description }. Add real
+  // exam dates here, or add them from the admin panel (admin.html).
+  const examDays = [];
+
+  // Activity days (PURPLE). Same { date, name, description } format.
+  const activityDays = [];
+
+  // Emergency holidays (RED) — ad-hoc closures. Same format.
+  const emergencyHoliday = [];
+
+  // Special school events (BLUE) — celebrated on campus but NOT a day off.
+  // Format: { date, name }. Dates marked "approx" are lunar/variable —
+  // verify against the current year's official Panchang before publishing.
+  const specialEvents = [
+    { date: "2026-07-29", name: "Guru Purnima (approx — UPDATE)" },
+    { date: "2026-08-15", name: "Independence Day" },
+    { date: "2026-08-26", name: "Onam (approx — UPDATE)" },
+    { date: "2026-09-05", name: "Teachers' Day" },
+    { date: "2026-10-02", name: "Gandhi Jayanti" },
+    { date: "2026-10-29", name: "Karva Chauth" },
+    { date: "2026-11-06", name: "Dhanteras" },
+    { date: "2026-11-11", name: "Bhai Dooj" },
+    { date: "2026-11-14", name: "Children's Day" },
+    { date: "2027-01-26", name: "Republic Day" },
+    { date: "2027-02-01", name: "Vasant Panchami (approx — UPDATE)" },
+    { date: "2027-03-21", name: "Holika Dahan" },
+    { date: "2027-04-14", name: "Baisakhi" },
+    { date: "2027-04-22", name: "Hanuman Jayanti (approx — UPDATE)" },
+    { date: "2027-04-29", name: "Akshaya Tritiya (approx — UPDATE)" },
+    { date: "2027-06-05", name: "World Environment Day" },
+    { date: "2027-06-16", name: "Muharram (approx — UPDATE)" }
+  ];
+
+  // Important reminders (ORANGE). Same { date, name, description } format.
+  const reminders = [];
+
+  /* --------------------------------------------------------------
+     2. MONTH CONFIGURATION — theme, copy, gallery per month
+     -------------------------------------------------------------- */
+  const MONTHS = [
+    {
+      year: 2026, month: 6, theme: "monsoon", themeName: "Monsoon Theme",
+      icons: ["💧", "☔", "🌧️"],
+      quote: "A good teacher plants seeds that grow long after the season has changed.",
+      notice: "Monsoon safety: students are advised to carry umbrellas/raincoats. School gates open 15 minutes earlier for wet-weather assembly.",
+      principal: "Welcome back to a fresh academic year! July brings renewal — in nature and in learning. Let's begin with curiosity and care for one another.",
+      coCurr: {
+        heading: "Rainy-Day Reading Circle",
+        desc: "A cosy indoor program that turns monsoon afternoons into a celebration of stories and shared reading.",
+        bullets: ["Weekly read-aloud sessions by grade", "Book-swap corner in every classroom", "Storytelling competition (Week 3)"]
+      },
+      gallery: ["images/july1.jpg", "images/july2.jpg", "images/july3.jpg"]
+    },
+    {
+      year: 2026, month: 7, theme: "independence", themeName: "Independence Day Theme",
+      icons: ["🇮🇳", "🎉", "🪁"],
+      quote: "Freedom is best honoured by the responsibility we carry for our community.",
+      notice: "Flag hoisting ceremony on 15 August at 8:00 AM. Students to arrive in tricolour theme attire.",
+      principal: "This month we celebrate the spirit of independence — a wonderful moment to talk with your children about courage, unity and civic pride.",
+      coCurr: {
+        heading: "Patriotic Expressions Week",
+        desc: "A week of art, poetry and performance celebrating the nation's history and values.",
+        bullets: ["Tricolour art & craft display", "Patriotic poem recitation", "Inter-house flag-hoisting drill"]
+      },
+      gallery: ["images/august1.jpg", "images/august2.jpg", "images/august3.jpg"]
+    },
+    {
+      year: 2026, month: 8, theme: "teachers", themeName: "Teachers' Day Theme",
+      icons: ["📚", "🍎", "✏️"],
+      quote: "A teacher's influence reaches into a future they will never see.",
+      notice: "Teachers' Day programme on 5 September, hosted entirely by our senior students in honour of the faculty.",
+      principal: "September gives us a chance to pause and thank the educators who shape every classroom into a place of wonder.",
+      coCurr: {
+        heading: "Student-Led Teaching Day",
+        desc: "Senior students step into the teacher's role for a day, building empathy and leadership.",
+        bullets: ["Peer-taught mini lessons", "Thank-you card workshop", "Faculty appreciation assembly"]
+      },
+      gallery: ["images/september1.jpg", "images/september2.jpg", "images/september3.jpg"]
+    },
+    {
+      year: 2026, month: 9, theme: "dussehra", themeName: "Dussehra Theme",
+      icons: ["🏹", "🎭", "🪔"],
+      quote: "The victory that matters most is the quiet one over our own doubts.",
+      notice: "School remains closed for Dussehra as per the holiday list. Assignments due before the break must be submitted by 17 October.",
+      principal: "Dussehra reminds us that good sense and patience triumph over impulse — values we try to nurture in our students every day.",
+      coCurr: {
+        heading: "Ramlila Appreciation Workshop",
+        desc: "An exploration of the stories, music and craft traditions behind the Dussehra festival.",
+        bullets: ["Mask and craft making session", "Classical dance demonstration", "Story-telling on values of Dussehra"]
+      },
+      gallery: ["images/october1.jpg", "images/october2.jpg", "images/october3.jpg"]
+    },
+    {
+      year: 2026, month: 10, theme: "diwali", themeName: "Diwali Theme",
+      icons: ["🪔", "✨", "🎇"],
+      quote: "Even the smallest light can guide someone out of the dark.",
+      notice: "Diwali Vacation dates are listed below. Please check the vacation banner for exact start and end dates.",
+      principal: "As the festival of lights approaches, may your homes be filled with warmth. We look forward to a joyful Diwali celebration with the children.",
+      coCurr: {
+        heading: "Festival of Lights Fair",
+        desc: "A vibrant school fair with diya painting, rangoli competitions and festive food stalls.",
+        bullets: ["Diya painting & decoration", "Inter-class rangoli contest", "Diwali charity donation drive"]
+      },
+      gallery: ["images/november1.jpg", "images/november2.jpg", "images/november3.jpg"]
+    },
+    {
+      year: 2026, month: 11, theme: "christmas", themeName: "Christmas & Winter Theme",
+      icons: ["🎄", "❄️", "🎅"],
+      quote: "Kindness, like snowfall, quietly changes the whole landscape.",
+      notice: "Winter Vacation begins 23 December. Christmas celebration and carol service on 22 December, 10:00 AM in the main hall.",
+      principal: "December brings festive cheer and a well-earned break. Wishing every family a warm and joyful holiday season.",
+      coCurr: {
+        heading: "Winter Carnival & Carol Service",
+        desc: "A festive celebration combining music, theatre and community giving.",
+        bullets: ["Christmas carol choir performance", "Winter-themed class decoration contest", "Toy & book donation drive"]
+      },
+      gallery: ["images/december1.jpg", "images/december2.jpg", "images/december3.jpg"]
+    },
+    {
+      year: 2027, month: 0, theme: "republic", themeName: "Republic Day Theme",
+      icons: ["🇮🇳", "🎖️", "📯"],
+      quote: "A nation grows strong when every citizen carries a sense of duty.",
+      notice: "Republic Day parade rehearsal from 20–25 January. Main ceremony on 26 January at 8:00 AM.",
+      principal: "The new year begins with a reminder of the values our constitution stands for — equality, liberty and justice for all.",
+      coCurr: {
+        heading: "Young Citizens Programme",
+        desc: "A civics-focused initiative helping students understand democratic values and national identity.",
+        bullets: ["Republic Day parade & march-past", "Constitution values quiz", "Best patriotic tableau award"]
+      },
+      gallery: ["images/january1.jpg", "images/january2.jpg", "images/january3.jpg"]
+    },
+    {
+      year: 2027, month: 1, theme: "spring", themeName: "Spring Theme",
+      icons: ["🌸", "🌷", "🦋"],
+      quote: "Growth is rarely loud — it happens quietly, one small bud at a time.",
+      notice: "Annual Spring Exhibition of student art and science projects on the last Friday of February.",
+      principal: "Spring is a season of blossoming — a lovely metaphor for how our students continue to grow, term after term.",
+      coCurr: {
+        heading: "Bloom & Grow Garden Project",
+        desc: "Hands-on gardening and environmental science activities that bring spring to life on campus.",
+        bullets: ["Classroom herb & flower planters", "Butterfly garden observation walk", "Spring art exhibition"]
+      },
+      gallery: ["images/february1.jpg", "images/february2.jpg", "images/february3.jpg"]
+    },
+    {
+      year: 2027, month: 2, theme: "holi", themeName: "Holi Theme",
+      icons: ["🎨", "🌈", "💦"],
+      quote: "Colour by colour, differences blend into something beautiful together.",
+      notice: "Holi celebration on campus with organic colours only. Please send an old change of clothes on the day.",
+      principal: "Holi is a joyful reminder that our differences, like colours, are what make our community beautiful.",
+      coCurr: {
+        heading: "Festival of Colours Celebration",
+        desc: "A safe, organic-colour Holi celebration paired with lessons on the festival's cultural meaning.",
+        bullets: ["Organic colour play (supervised)", "Holi folk music & dance", "Cultural significance assembly talk"]
+      },
+      gallery: ["images/march1.jpg", "images/march2.jpg", "images/march3.jpg"]
+    },
+    {
+      year: 2027, month: 3, theme: "nature", themeName: "Fresh Nature Theme",
+      icons: ["🌿", "🌱", "🦜"],
+      quote: "Every tree we plant is a promise kept to a future we won't fully see.",
+      notice: "Annual tree plantation drive on Earth observance week. Each class will adopt one sapling to care for through the year.",
+      principal: "April's fresh greenery is the perfect classroom for lessons on sustainability, patience and stewardship of our planet.",
+      coCurr: {
+        heading: "Green Campus Initiative",
+        desc: "A month-long project encouraging students to take ownership of sustainability on campus.",
+        bullets: ["Tree plantation drive", "Recycled-material craft challenge", "Nature trail & bird-watching walk"]
+      },
+      gallery: ["images/april1.jpg", "images/april2.jpg", "images/april3.jpg"]
+    },
+    {
+      year: 2027, month: 4, theme: "summer", themeName: "Summer Theme",
+      icons: ["☀️", "🍉", "🕶️"],
+      quote: "Rest is not the opposite of learning — it is where learning settles in.",
+      notice: "Summer Vacation begins 10 May. Optional summer enrichment workshops will be announced separately.",
+      principal: "As the school year winds toward summer, I encourage every family to make space for rest, play and togetherness.",
+      coCurr: {
+        heading: "Summer Skills Workshops",
+        desc: "Optional short workshops held before the break, focused on creativity and life skills.",
+        bullets: ["Art & craft summer workshop", "Basic cooking & nutrition session", "Sports skill-building camp"]
+      },
+      gallery: ["images/may1.jpg", "images/may2.jpg", "images/may3.jpg"]
+    },
+    {
+      year: 2027, month: 5, theme: "rainarrival", themeName: "Rain Arrival Theme",
+      icons: ["🌧️", "🌦️", "🍃"],
+      quote: "The first rains of the year always seem to wash the slate clean.",
+      notice: "New academic session admissions open. Summer Vacation continues until 26 June — school reopens 28 June.",
+      principal: "As the monsoon returns, so does the promise of a new academic cycle. We look forward to welcoming everyone back refreshed.",
+      coCurr: {
+        heading: "Welcome-Back Orientation",
+        desc: "A gentle re-entry programme helping students transition back into the school routine after the break.",
+        bullets: ["New session orientation assembly", "Classroom goal-setting activity", "Rain-song music & rhythm session"]
+      },
+      gallery: ["images/june1.jpg", "images/june2.jpg", "images/june3.jpg"]
+    }
+  ];
+
+  const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const WEEKDAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  /* --------------------------------------------------------------
+     3. HELPERS
+     -------------------------------------------------------------- */
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function isoDate(y, mZero, d) { return `${y}-${pad(mZero + 1)}-${pad(d)}`; }
+  function monthId(y, mZero) { return `month-${y}-${pad(mZero + 1)}`; }
+
+  function inRange(iso, start, end) { return iso >= start && iso <= end; }
+
+  function findVacation(iso) {
+    return vacations.find(v => inRange(iso, v.start, v.end));
+  }
+  function findByDate(arr, iso) { return arr.find(x => x.date === iso); }
+
+  // Determine styling + label + description for a single date (priority
+  // order matters). `label` is the specific name; `type` is the plain
+  // category word and `desc` the optional longer text shown in the
+  // click-to-view day info panel.
+  function classifyDay(iso, isSunday) {
+    const emg = findByDate(emergencyHoliday, iso);
+    if (emg) return { cls: "holiday", label: emg.name || "Emergency Holiday", type: "Holiday", desc: emg.description || "" };
+    const vac = findVacation(iso);
+    if (vac) return { cls: "holiday", label: vac.name, type: "Holiday", desc: vac.description || "" };
+    const hol = findByDate(holidays, iso);
+    if (hol) return { cls: "holiday", label: hol.name, type: "Holiday", desc: hol.description || "" };
+    const exm = findByDate(examDays, iso);
+    if (exm) return { cls: "exam", label: exm.name || "Exam", type: "Exam", desc: exm.description || "" };
+    const act = findByDate(activityDays, iso);
+    if (act) return { cls: "activity", label: act.name || "Activity", type: "Activity", desc: act.description || "" };
+    const evt = findByDate(specialEvents, iso);
+    if (evt) return { cls: "event", label: evt.name, type: "School Event", desc: evt.description || "" };
+    const rem = findByDate(reminders, iso);
+    if (rem) return { cls: "reminder", label: rem.name || "Important Reminder", type: "Reminder", desc: rem.description || "" };
+    if (isSunday) return { cls: "sunday", label: "Sunday", type: "Sunday", desc: "" };
+    return { cls: "", label: "", type: "", desc: "" };
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+
+  /* --------------------------------------------------------------
+     3b. REMOTE DATA (admin-added events, read-only here)
+     Any admin-added entry for a date overrides the built-in default
+     for that same date. See admin.html for how entries are written.
+     -------------------------------------------------------------- */
+  // TODO: paste your Firebase project config here (same object as in
+  // admin.html). Until this is filled in, the calendar simply falls
+  // back to the built-in dates below — nothing breaks.
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  function removeDateEverywhere(iso) {
+    [holidays, examDays, activityDays, specialEvents, reminders, emergencyHoliday].forEach(arr => {
+      for (let i = arr.length - 1; i >= 0; i--) if (arr[i].date === iso) arr.splice(i, 1);
+    });
+  }
+
+  function applyRemoteEvent(d) {
+    if (!d || !d.date || !d.category) return;
+    removeDateEverywhere(d.date);
+    const entry = { date: d.date, name: d.name || "", description: d.description || "" };
+    const target = { holiday: holidays, exam: examDays, activity: activityDays, event: specialEvents, reminder: reminders, emergency: emergencyHoliday }[d.category];
+    if (target) target.push(entry);
+  }
+
+  async function fetchRemoteData() {
+    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") return; // not configured yet
+    try {
+      if (!window.firebase) return;
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const [eventsSnap, vacSnap] = await Promise.all([
+        db.collection("events").get(),
+        db.collection("vacations").get()
+      ]);
+      eventsSnap.forEach(doc => applyRemoteEvent(doc.data()));
+      vacSnap.forEach(doc => {
+        const v = doc.data();
+        if (v && v.name && v.start && v.end) vacations.push({ name: v.name, start: v.start, end: v.end, description: v.description || "" });
+      });
+    } catch (err) {
+      console.warn("Could not load admin-added calendar data — showing built-in dates only.", err);
+    }
+  }
+
+  /* --------------------------------------------------------------
+     4. CALENDAR GRID BUILDER
+     -------------------------------------------------------------- */
+  function buildCalendarTable(year, mZero) {
+    const firstDay = new Date(year, mZero, 1).getDay();
+    const daysInMonth = new Date(year, mZero + 1, 0).getDate();
+    const todayIso = new Date().toISOString().slice(0, 10);
+
+    let theadRow = WEEKDAYS.map(w => `<th scope="col">${w}</th>`).join("");
+    let cells = "";
+    for (let i = 0; i < firstDay; i++) cells += `<td><div class="cal-day empty" aria-hidden="true"></div></td>`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const iso = isoDate(year, mZero, d);
+      const dow = new Date(year, mZero, d).getDay();
+      const isSunday = dow === 0;
+      const info = classifyDay(iso, isSunday);
+      const isToday = iso === todayIso;
+      const classes = ["cal-day"];
+      if (info.cls) classes.push(info.cls);
+      if (isSunday) classes.push("sunday");
+      if (isToday) classes.push("today");
+      const title = info.label ? `${MONTH_NAMES[mZero]} ${d}, ${year} — ${info.label}` : `${MONTH_NAMES[mZero]} ${d}, ${year}`;
+      const fullDate = `${MONTH_NAMES[mZero]} ${d}, ${year}`;
+      cells += `<td><div class="${classes.join(" ")}" tabindex="0" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}" data-date="${escapeHtml(fullDate)}" data-type="${escapeHtml(info.type)}" data-name="${escapeHtml(info.label)}" data-desc="${escapeHtml(info.desc)}">${d}</div></td>`;
+    }
+
+    // pad trailing cells to complete the final week row
+    const totalCells = firstDay + daysInMonth;
+    const trailing = (7 - (totalCells % 7)) % 7;
+    for (let i = 0; i < trailing; i++) cells += `<td><div class="cal-day empty" aria-hidden="true"></div></td>`;
+
+    // chunk into rows of 7
+    const cellArray = cells.match(/<td>.*?<\/td>/g) || [];
+    let rows = "";
+    for (let i = 0; i < cellArray.length; i += 7) {
+      rows += `<tr>${cellArray.slice(i, i + 7).join("")}</tr>`;
+    }
+
+    return `
+      <table class="calendar-table" aria-label="${MONTH_NAMES[mZero]} ${year} calendar">
+        <caption>${MONTH_NAMES[mZero]} ${year}</caption>
+        <thead><tr>${theadRow}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  /* --------------------------------------------------------------
+     5. VACATION BANNER (shown only if this month overlaps a vacation)
+     -------------------------------------------------------------- */
+  function buildVacationBanner(year, mZero) {
+    const monthStart = isoDate(year, mZero, 1);
+    const monthEnd = isoDate(year, mZero, new Date(year, mZero + 1, 0).getDate());
+    const overlapping = vacations.filter(v => v.start <= monthEnd && v.end >= monthStart);
+    if (!overlapping.length) return "";
+    const text = overlapping.map(v => `<strong>${v.name}:</strong> ${v.start} to ${v.end}`).join(" &nbsp;|&nbsp; ");
+    return `<div class="vacation-banner show">🏖️ ${text}</div>`;
+  }
+
+  /* --------------------------------------------------------------
+     6. MONTH SECTION BUILDER
+     -------------------------------------------------------------- */
+  function buildMonthSection(cfg, index) {
+    const id = monthId(cfg.year, cfg.month);
+    const prev = MONTHS[index - 1];
+    const next = MONTHS[index + 1];
+
+    const section = document.createElement("section");
+    section.className = "month-section reveal";
+    section.id = id;
+    section.dataset.theme = cfg.theme;
+    section.setAttribute("aria-labelledby", id + "-title");
+
+    section.innerHTML = `
+      <div class="deco blob" aria-hidden="true"></div>
+      <div class="deco d1" aria-hidden="true">${cfg.icons[0]}</div>
+      <div class="deco d2" aria-hidden="true">${cfg.icons[1]}</div>
+      <div class="deco d3" aria-hidden="true">${cfg.icons[2]}</div>
+
+      <div class="month-header">
+        <span class="month-eyebrow">Lotus Academy · School Calendar</span>
+        <h2 class="month-title" id="${id}-title">${MONTH_NAMES[cfg.month]} ${cfg.year}</h2>
+      </div>
+
+      <div class="month-controls">
+        ${prev ? `<button class="btn" data-goto="${monthId(prev.year, prev.month)}">← ${MONTH_NAMES[prev.month].slice(0,3)} ${prev.year}</button>` : ""}
+        <button class="btn" data-goto="top">Go to Top</button>
+        ${next ? `<button class="btn" data-goto="${monthId(next.year, next.month)}">${MONTH_NAMES[next.month].slice(0,3)} ${next.year} →</button>` : ""}
+      </div>
+
+      <div class="legend">
+        <span class="legend-item"><span class="dot holiday"></span>Holiday / Vacation / Sunday</span>
+        <span class="legend-item"><span class="dot exam"></span>Exam</span>
+        <span class="legend-item"><span class="dot activity"></span>Activity</span>
+        <span class="legend-item"><span class="dot event"></span>Special Event</span>
+        <span class="legend-item"><span class="dot reminder"></span>Reminder</span>
+      </div>
+
+      <div class="calendar-card">
+        ${buildCalendarTable(cfg.year, cfg.month)}
+      </div>
+
+      <div class="day-info-panel" aria-live="polite">
+        <p class="day-info-placeholder">👆 Tap any date above to see what's happening that day.</p>
+      </div>
+
+      ${buildVacationBanner(cfg.year, cfg.month)}
+
+      <div class="info-grid">
+        <div class="info-card cocurricular-card">
+          <h3>Co-Curricular Activity</h3>
+          <p><strong>${cfg.coCurr.heading}</strong></p>
+          <p>${cfg.coCurr.desc}</p>
+          <ul>${cfg.coCurr.bullets.map(b => `<li>${b}</li>`).join("")}</ul>
+        </div>
+        <div class="info-card notice-card">
+          <h3>Monthly Notice</h3>
+          <p>${cfg.notice}</p>
+          <div class="highlight-box">Please check the school app / notice board regularly for updates.</div>
+        </div>
+        <div class="info-card principal-card">
+          <h3>Principal's Message</h3>
+          <p>${cfg.principal}</p>
+          <p class="principal-sign">— Principal, Lotus Academy</p>
+        </div>
+      </div>
+
+      <p class="gallery-heading">Moments from <span>${MONTH_NAMES[cfg.month]}</span></p>
+      <div class="gallery-grid">
+        ${cfg.gallery.map((src, i) => `
+          <div class="gallery-item">
+            <img src="${src}" alt="Lotus Academy ${MONTH_NAMES[cfg.month]} gallery photo ${i + 1}" loading="lazy">
+          </div>`).join("")}
+      </div>
+
+      <div class="quote-block">
+        <p class="quote-text">${cfg.quote}</p>
+        <p class="quote-source">Lotus Academy · Thought for the Month</p>
+      </div>
+    `;
+    return section;
+  }
+
+  /* --------------------------------------------------------------
+     7. NAVIGATION BUILDER
+     -------------------------------------------------------------- */
+  function buildNav() {
+    const navInner = document.getElementById("navInner");
+    const frag = document.createDocumentFragment();
+    MONTHS.forEach(cfg => {
+      const id = monthId(cfg.year, cfg.month);
+      const a = document.createElement("a");
+      a.href = `#${id}`;
+      a.className = "nav-pill";
+      a.dataset.target = id;
+      a.textContent = `${MONTH_NAMES[cfg.month].slice(0, 3)} ${cfg.year}`;
+      frag.appendChild(a);
+    });
+    navInner.appendChild(frag);
+  }
+
+  /* --------------------------------------------------------------
+     8. SMOOTH SCROLL + BUTTON WIRING
+     -------------------------------------------------------------- */
+  function scrollToId(id) {
+    if (id === "top") { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function showDayInfo(dayEl) {
+    const section = dayEl.closest(".month-section");
+    if (!section) return;
+    const panel = section.querySelector(".day-info-panel");
+    if (!panel) return;
+
+    // clear previous selection within this month, then mark the new one
+    section.querySelectorAll(".cal-day.selected").forEach(el => el.classList.remove("selected"));
+    dayEl.classList.add("selected");
+
+    const date = dayEl.dataset.date;
+    const type = dayEl.dataset.type;
+    const name = dayEl.dataset.name;
+    const desc = dayEl.dataset.desc;
+
+    if (type) {
+      const tagCls = dayEl.classList.contains("holiday") ? "holiday" : dayEl.classList.contains("exam") ? "exam" : dayEl.classList.contains("activity") ? "activity" : dayEl.classList.contains("event") ? "event" : dayEl.classList.contains("reminder") ? "reminder" : "sunday";
+      panel.innerHTML = `<span class="day-info-date">${escapeHtml(date)}</span>${escapeHtml(name)}<span class="day-info-tag ${tagCls}">${escapeHtml(type)}</span>` +
+        (desc ? `<div class="day-info-desc">${escapeHtml(desc)}</div>` : "");
+    } else {
+      panel.innerHTML = `<span class="day-info-date">${escapeHtml(date)}</span>No event, exam or activity scheduled.<span class="day-info-tag none">Regular Day</span>`;
+    }
+  }
+
+  function wireControls() {
+    document.body.addEventListener("click", e => {
+      const btn = e.target.closest("[data-goto]");
+      if (btn) { e.preventDefault(); scrollToId(btn.dataset.goto); return; }
+      const day = e.target.closest(".cal-day");
+      if (day && !day.classList.contains("empty")) { showDayInfo(day); }
+    });
+    // keyboard support: Enter / Space on a focused date shows its info too
+    document.body.addEventListener("keydown", e => {
+      if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("cal-day") && !e.target.classList.contains("empty")) {
+        e.preventDefault();
+        showDayInfo(e.target);
+      }
+    });
+    document.getElementById("goTopBtn").addEventListener("click", () => scrollToId("top"));
+    document.getElementById("footerTopLink").addEventListener("click", e => { e.preventDefault(); scrollToId("top"); });
+  }
+
+  /* --------------------------------------------------------------
+     9. SCROLL-SPY (active nav pill) + GO-TOP VISIBILITY + REVEAL
+     -------------------------------------------------------------- */
+  function initObservers() {
+    const goTopBtn = document.getElementById("goTopBtn");
+    window.addEventListener("scroll", () => {
+      goTopBtn.classList.toggle("show", window.scrollY > 500);
+    }, { passive: true });
+
+    const sections = Array.from(document.querySelectorAll(".month-section"));
+    const pills = Array.from(document.querySelectorAll(".nav-pill"));
+
+    const spy = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          pills.forEach(p => p.removeAttribute("aria-current"));
+          const match = pills.find(p => p.dataset.target === entry.target.id);
+          if (match) {
+            match.setAttribute("aria-current", "true");
+            match.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+          }
+        }
+      });
+    }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
+    sections.forEach(s => spy.observe(s));
+
+    const reveal = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) { entry.target.classList.add("in-view"); reveal.unobserve(entry.target); }
+      });
+    }, { threshold: 0.08 });
+    sections.forEach(s => reveal.observe(s));
+  }
+
+  /* --------------------------------------------------------------
+     10. AUTO-OPEN CURRENT MONTH
+     -------------------------------------------------------------- */
+  function scrollToCurrentMonth() {
+    const now = new Date();
+    const el = document.getElementById(monthId(now.getFullYear(), now.getMonth()));
+    if (!el) return; // today falls outside Jul 2026 – Jun 2027, stay at top
+    // jump instantly (no smooth animation) so the page doesn't visibly
+    // scroll from the top on first load
+    requestAnimationFrame(() => el.scrollIntoView({ behavior: "auto", block: "start" }));
+  }
+
+  /* --------------------------------------------------------------
+     11. INIT
+     -------------------------------------------------------------- */
+  async function init() {
+    await fetchRemoteData(); // load any admin-added events first so they render correctly
+    buildNav();
+    const main = document.getElementById("main-content");
+    const frag = document.createDocumentFragment();
+    MONTHS.forEach((cfg, i) => frag.appendChild(buildMonthSection(cfg, i)));
+    main.appendChild(frag);
+    wireControls();
+    initObservers();
+    document.getElementById("footerYear").textContent = new Date().getFullYear();
+    scrollToCurrentMonth();
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
