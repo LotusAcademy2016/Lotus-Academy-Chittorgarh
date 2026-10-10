@@ -428,7 +428,40 @@
 
 <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
 <script src="main.js"></script>
+<!-- Hamburger menu popup logic -->
+<script>
+(function () {
+  var btn = document.getElementById('menuBtn');
+  var overlay = document.getElementById('menuOverlay');
+  var closeBtn = document.getElementById('menuClose');
+  if (!btn || !overlay) return;
 
+  function openMenu() {
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+    btn.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('menu-open');
+  }
+  function closeMenu() {
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
+  }
+
+  btn.addEventListener('click', function () {
+    overlay.classList.contains('show') ? closeMenu() : openMenu();
+  });
+  closeBtn.addEventListener('click', closeMenu);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeMenu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  overlay.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
+})();
+</script>
+
+<script src="main.js"></script>
 <!-- Gallery Admin: lets a logged-in admin add/delete photos. See ADMIN-SETUP.md -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
