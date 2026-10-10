@@ -21,12 +21,12 @@
   .menu-btn {
     display: inline-flex; flex-direction: column; justify-content: center; align-items: center;
     gap: 5px; width: 44px; height: 44px; padding: 0;
-    background: transparent; border: 2px solid var(--royal-deep:#0E2F57);
+    background: transparent; border: 2px solid var(--maroon, #8a1c3c);
     border-radius: 12px; cursor: pointer; transition: background .2s ease;
   }
   .menu-btn span {
     display: block; width: 20px; height: 2.5px; border-radius: 2px;
-    background: var(--royal-deep:#0E2F57); transition: transform .25s ease, opacity .25s ease;
+    background: var(--maroon, #8a1c3c); transition: transform .25s ease, opacity .25s ease;
   }
   .menu-btn:hover { background: rgba(0,0,0,.05); }
   .menu-btn.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
@@ -55,7 +55,7 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 6px 10px 12px; margin-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,.08);
   }
-  .menu-popup-head b { font-family: 'Fraunces', serif; font-size: 1.15rem; color: var(--royal-deep:#0E2F57); }
+  .menu-popup-head b { font-family: 'Fraunces', serif; font-size: 1.15rem; color: var(--maroon, #8a1c3c); }
   .menu-close {
     width: 34px; height: 34px; border: 0; border-radius: 50%; cursor: pointer;
     background: rgba(0,0,0,.06); font-size: 1.1rem; line-height: 1;
@@ -70,10 +70,10 @@
   }
   .menu-popup nav a .ic { width: 26px; text-align: center; font-size: 1.15rem; }
   .menu-popup nav a:hover { background: rgba(0,0,0,.06); transform: translateX(3px); }
-  .menu-popup nav a.active { background: var(--royal-deep:#0E2F57); color: #fff; }
+  .menu-popup nav a.active { background: var(--maroon, #8a1c3c); color: #fff; }
   .menu-popup .menu-call {
     display: block; text-align: center; margin-top: 10px; padding: 12px 14px;
-    border-radius: 12px; background: var(--royal-deep:#0E2F57); color: #fff;
+    border-radius: 12px; background: var(--maroon, #8a1c3c); color: #fff;
     text-decoration: none; font-weight: 600;
   }
 
@@ -126,16 +126,15 @@
       <button class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
     </div>
     <nav>
-      <a href="index.html" class="active"><span class="ic"></span>Home</a>
-      <a href="about.html"><span class="ic"></span>About &amp; Principal</a>
-      <a href="staff.html"><span class="ic"></span>Staff Details</a>
-      <a href="fees.html"><span class="ic"></span>Fees Structure</a>
-      <a href="gallery.html"><span class="ic"></span>Albums</a>
-      <a href="calendar.html"><span class="ic"></span>Calendar</a>
-      <a href="contact.html"><span class="ic"></span>Contact</a>
-    
+      <a href="index.html" class="active"><span class="ic">🏠</span>Home</a>
+      <a href="about.html"><span class="ic">🎓</span>About &amp; Principal</a>
+      <a href="staff.html"><span class="ic">👩‍🏫</span>Staff Details</a>
+      <a href="fees.html"><span class="ic">💰</span>Fees Structure</a>
+      <a href="gallery.html"><span class="ic">🖼️</span>Albums</a>
+      <a href="calendar.html"><span class="ic">📅</span>Calendar</a>
+      <a href="contact.html"><span class="ic">📍</span>Contact</a>
+    </nav>
     <a href="tel:+919460327854" class="menu-call">📞 Call: 9460327854</a>
-      </nav>
   </div>
 </div>
 
