@@ -9,6 +9,98 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 
+<!-- Hamburger menu + popup styles -->
+<style>
+  /* purana nav aur purana toggle button chhupa diye (main.js ke liye element rakha hai) */
+  .main-nav { display: none !important; }
+  .menu-toggle { display: none !important; }
+
+  .header-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .header-actions .call-btn { white-space: nowrap; }
+
+  .menu-btn {
+    display: inline-flex; flex-direction: column; justify-content: center; align-items: center;
+    gap: 5px; width: 44px; height: 44px; padding: 0;
+    background: transparent; border: 2px solid var(--maroon, #8a1c3c);
+    border-radius: 12px; cursor: pointer; transition: background .2s ease;
+  }
+  .menu-btn span {
+    display: block; width: 20px; height: 2.5px; border-radius: 2px;
+    background: var(--maroon, #8a1c3c); transition: transform .25s ease, opacity .25s ease;
+  }
+  .menu-btn:hover { background: rgba(0,0,0,.05); }
+  .menu-btn.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+  .menu-btn.open span:nth-child(2) { opacity: 0; }
+  .menu-btn.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+  .menu-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(20, 10, 15, .55); backdrop-filter: blur(3px);
+    display: flex; align-items: flex-start; justify-content: flex-end;
+    padding: 76px 18px 18px;
+    opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s ease;
+  }
+  .menu-overlay.show { opacity: 1; visibility: visible; }
+
+  .menu-popup {
+    width: 100%; max-width: 340px; max-height: calc(100vh - 100px); overflow-y: auto;
+    background: #fff; border-radius: 20px; padding: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.3);
+    transform: translateY(-14px) scale(.97); transition: transform .25s ease;
+    font-family: 'Poppins', sans-serif;
+  }
+  .menu-overlay.show .menu-popup { transform: translateY(0) scale(1); }
+
+  .menu-popup-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px 12px; margin-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,.08);
+  }
+  .menu-popup-head b { font-family: 'Fraunces', serif; font-size: 1.15rem; color: var(--maroon, #8a1c3c); }
+  .menu-close {
+    width: 34px; height: 34px; border: 0; border-radius: 50%; cursor: pointer;
+    background: rgba(0,0,0,.06); font-size: 1.1rem; line-height: 1;
+  }
+  .menu-close:hover { background: rgba(0,0,0,.12); }
+
+  .menu-popup nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; margin: 2px 0; border-radius: 12px;
+    text-decoration: none; color: #2b2b2b; font-weight: 500; font-size: .98rem;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .menu-popup nav a .ic { width: 26px; text-align: center; font-size: 1.15rem; }
+  .menu-popup nav a:hover { background: rgba(0,0,0,.06); transform: translateX(3px); }
+  .menu-popup nav a.active { background: var(--maroon, #8a1c3c); color: #fff; }
+  .menu-popup .menu-call {
+    display: block; text-align: center; margin-top: 10px; padding: 12px 14px;
+    border-radius: 12px; background: var(--maroon, #8a1c3c); color: #fff;
+    text-decoration: none; font-weight: 600;
+  }
+
+  body.menu-open { overflow: hidden; }
+
+  @media (max-width: 520px) {
+    .header-actions .call-btn { display: none; } /* chhoti screen par call button popup me milega */
+    .menu-overlay { padding: 70px 12px 12px; justify-content: center; }
+    .menu-popup { max-width: 100%; }
+  }
+
+  /* Page notice card */
+  .notice-card {
+    max-width: 760px; margin: 34px auto 0; padding: 44px 34px; text-align: center;
+    background: #fff; border-radius: 22px; border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 14px 40px rgba(0,0,0,.08);
+  }
+  .notice-card .notice-ic {
+    width: 84px; height: 84px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; border-radius: 50%; background: rgba(0,0,0,.05);
+  }
+  .notice-card h3 { font-family: 'Fraunces', serif; font-size: 1.6rem; margin: 0 0 12px; color: var(--maroon, #8a1c3c); }
+  .notice-card p { font-family: 'Poppins', sans-serif; line-height: 1.8; margin: 0 0 10px; color: #444; }
+  .notice-card .notice-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+  @media (max-width: 520px) { .notice-card { padding: 32px 20px; } }
+</style>
+  
 </head>
 <body>
 
@@ -26,16 +118,42 @@
       <img src="logo.jpg" alt="Lotus Academy crest">
       <span class="name">Lotus Academy<small>Chittorgarh · Est. 2016</small></span>
     </a>
-    <nav class="main-nav">
-      <a href="index.html">Home</a>
-      <a href="about.html" class="active">About &amp; Principal</a>
-      <a href="gallery.html">Albums</a>
-      <a href="calendar.html">Calendar</a>
-      <a href="contact.html">Contact</a>
-      <a href="tel:+919460327854" class="call-btn">📞 9460327854</a>
-    </nav>
-    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    
+    <!-- purana nav (khali, hidden) — main.js ke liye element bacha ke rakha hai -->
+    <!-- purana nav (khali, hidden) — main.js ke liye element bacha ke rakha hai -->
+    <nav class="main-nav" aria-hidden="true"></nav>
+
+    <div class="header-actions">
+      
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="menuOverlay">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- purana toggle (hidden, sirf compatibility ke liye) -->
+    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-hidden="true" tabindex="-1">☰</button>
   </div>
+</header>
+
+<!-- Menu popup -->
+<div class="menu-overlay" id="menuOverlay" aria-hidden="true">
+  <div class="menu-popup" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="menu-popup-head">
+      <b>Menu</b>
+      <button class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
+    </div>
+    <nav>
+      <a href="index.html"><span class="ic"></span>Home</a>
+      <a href="about.html"><span class="ic"></span>About &amp; Principal</a>
+      <a href="staff.html" class="active"><span class="ic"></span>Staff Details</a>
+      <a href="fees.html"><span class="ic"></span>Fees Structure</a>
+      <a href="gallery.html"><span class="ic"></span>Albums</a>
+      <a href="calendar.html"><span class="ic"></span>Calendar</a>
+      <a href="contact.html"><span class="ic"></span>Contact</a>
+    </nav>
+    <a href="tel:+919460327854" class="menu-call">📞 Call: 9460327854</a>
+  </div>
+</div>
 </header>
 
 <div class="toran"></div>
