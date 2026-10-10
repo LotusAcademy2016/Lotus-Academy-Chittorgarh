@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fees Structure — Lotus Academy, Chittorgarh</title>
+<meta name="description" content="Fees structure of Lotus Academy, Chittorgarh — an English medium (RBSE) co-education school for Nursery to Class 5.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Hamburger menu + popup styles -->
+<style>
+  /* purana nav aur purana toggle button chhupa diye (main.js ke liye element rakha hai) */
+  .main-nav { display: none !important; }
+  .menu-toggle { display: none !important; }
+
+  .header-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .header-actions .call-btn { white-space: nowrap; }
+
+  .menu-btn {
+    display: inline-flex; flex-direction: column; justify-content: center; align-items: center;
+    gap: 5px; width: 44px; height: 44px; padding: 0;
+    background: transparent; border: 2px solid var(--maroon, #8a1c3c);
+    border-radius: 12px; cursor: pointer; transition: background .2s ease;
+  }
+  .menu-btn span {
+    display: block; width: 20px; height: 2.5px; border-radius: 2px;
+    background: var(--maroon, #8a1c3c); transition: transform .25s ease, opacity .25s ease;
+  }
+  .menu-btn:hover { background: rgba(0,0,0,.05); }
+  .menu-btn.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+  .menu-btn.open span:nth-child(2) { opacity: 0; }
+  .menu-btn.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+  .menu-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(20, 10, 15, .55); backdrop-filter: blur(3px);
+    display: flex; align-items: flex-start; justify-content: flex-end;
+    padding: 76px 18px 18px;
+    opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s ease;
+  }
+  .menu-overlay.show { opacity: 1; visibility: visible; }
+
+  .menu-popup {
+    width: 100%; max-width: 340px; max-height: calc(100vh - 100px); overflow-y: auto;
+    background: #fff; border-radius: 20px; padding: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.3);
+    transform: translateY(-14px) scale(.97); transition: transform .25s ease;
+    font-family: 'Poppins', sans-serif;
+  }
+  .menu-overlay.show .menu-popup { transform: translateY(0) scale(1); }
+
+  .menu-popup-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px 12px; margin-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,.08);
+  }
+  .menu-popup-head b { font-family: 'Fraunces', serif; font-size: 1.15rem; color: var(--maroon, #8a1c3c); }
+  .menu-close {
+    width: 34px; height: 34px; border: 0; border-radius: 50%; cursor: pointer;
+    background: rgba(0,0,0,.06); font-size: 1.1rem; line-height: 1;
+  }
+  .menu-close:hover { background: rgba(0,0,0,.12); }
+
+  .menu-popup nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; margin: 2px 0; border-radius: 12px;
+    text-decoration: none; color: #2b2b2b; font-weight: 500; font-size: .98rem;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .menu-popup nav a .ic { width: 26px; text-align: center; font-size: 1.15rem; }
+  .menu-popup nav a:hover { background: rgba(0,0,0,.06); transform: translateX(3px); }
+  .menu-popup nav a.active { background: var(--maroon, #8a1c3c); color: #fff; }
+  .menu-popup .menu-call {
+    display: block; text-align: center; margin-top: 10px; padding: 12px 14px;
+    border-radius: 12px; background: var(--maroon, #8a1c3c); color: #fff;
+    text-decoration: none; font-weight: 600;
+  }
+
+  body.menu-open { overflow: hidden; }
+
+  @media (max-width: 520px) {
+    .header-actions .call-btn { display: none; } /* chhoti screen par call button popup me milega */
+    .menu-overlay { padding: 70px 12px 12px; justify-content: center; }
+    .menu-popup { max-width: 100%; }
+  }
+
+  /* Page notice card */
+  .notice-card {
+    max-width: 760px; margin: 34px auto 0; padding: 44px 34px; text-align: center;
+    background: #fff; border-radius: 22px; border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 14px 40px rgba(0,0,0,.08);
+  }
+  .notice-card .notice-ic {
+    width: 84px; height: 84px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; border-radius: 50%; background: rgba(0,0,0,.05);
+  }
+  .notice-card h3 { font-family: 'Fraunces', serif; font-size: 1.6rem; margin: 0 0 12px; color: var(--maroon, #8a1c3c); }
+  .notice-card p { font-family: 'Poppins', sans-serif; line-height: 1.8; margin: 0 0 10px; color: #444; }
+  .notice-card .notice-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+  @media (max-width: 520px) { .notice-card { padding: 32px 20px; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="shieldClip" clipPathUnits="objectBoundingBox">
+      <path d="M0.5,0.02 C0.4,0.09 0.25,0.06 0.15,0.13 C0.05,0.20 0.02,0.30 0.02,0.30 L0.02,0.62 C0.02,0.85 0.20,1.0 0.5,1.0 C0.8,1.0 0.98,0.85 0.98,0.62 L0.98,0.30 C0.98,0.30 0.95,0.20 0.85,0.13 C0.75,0.06 0.6,0.09 0.5,0.02 Z"/>
+    </clipPath>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand">
+      <img src="logo.jpg" alt="Lotus Academy crest">
+      <span class="name">Lotus Academy<small>Chittorgarh · Est. 2016</small></span>
+    </a>
+
+    <!-- purana nav (khali, hidden) — main.js ke liye element bacha ke rakha hai -->
+    <nav class="main-nav" aria-hidden="true"></nav>
+
+    <div class="header-actions">
+      <a href="tel:+919460327854" class="call-btn">📞 9460327854</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="menuOverlay">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- purana toggle (hidden, sirf compatibility ke liye) -->
+    <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false" aria-hidden="true" tabindex="-1">☰</button>
+  </div>
+</header>
+
+<!-- Menu popup -->
+<div class="menu-overlay" id="menuOverlay" aria-hidden="true">
+  <div class="menu-popup" role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="menu-popup-head">
+      <b>Menu</b>
+      <button class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
+    </div>
+    <nav>
+      <a href="index.html"><span class="ic">🏠</span>Home</a>
+      <a href="about.html"><span class="ic">🎓</span>About &amp; Principal</a>
+      <a href="staff.html"><span class="ic">👩‍🏫</span>Staff Details</a>
+      <a href="fees.html" class="active"><span class="ic">💰</span>Fees Structure</a>
+      <a href="gallery.html"><span class="ic">🖼️</span>Albums</a>
+      <a href="calendar.html"><span class="ic">📅</span>Calendar</a>
+      <a href="contact.html"><span class="ic">📍</span>Contact</a>
+    </nav>
+    <a href="tel:+919460327854" class="menu-call">📞 Call: 9460327854</a>
+  </div>
+</div>
+
+<div class="toran"></div>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Admissions · Nursery – Class 5</p>
+      <h2>Fees Structure</h2>
+      <p class="lede">Lotus Academy is committed to providing quality English medium education at a fair and transparent fee. Class-wise details are shared here for the convenience of parents.</p>
+    </div>
+
+    <div class="notice-card reveal">
+      <div class="notice-ic">💰</div>
+      <h3>Fee Details — Being Updated</h3>
+      <p>The class-wise fee structure for the current academic session is being finalised and will be published on this page shortly.</p>
+      <p>For admission and fee-related enquiries in the meantime, parents are requested to contact the school office directly.</p>
+      <div class="notice-actions">
+        <a href="tel:+919460327854" class="btn btn-primary">📞 Call 9460327854</a>
+        <a href="contact.html" class="btn btn-outline">Visit the School Office</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-grid">
+    <div>
+      <div class="foot-brand">
+        <img src="logo.jpg" alt="Lotus Academy crest">
+        <b>Lotus Academy</b>
+      </div>
+      <p style="opacity:.8;max-width:320px;">An English medium co-education school, Nursery to Class 5, affiliated to RBSE — nurturing young minds in Chittorgarh, Rajasthan for over a decade.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <a href="index.html">Home</a>
+      <a href="about.html">About &amp; Principal</a>
+      <a href="staff.html">Staff Details</a>
+      <a href="fees.html">Fees Structure</a>
+      <a href="gallery.html">Albums</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div>
+      <h4>Reach us</h4>
+      <a href="tel:+919460327854">📞 +91 94603 27854</a>
+      <a href="contact.html">80, Maharishi Dadhichi Kumbha Nagar, Chittorgarh, Rajasthan</a>
+    </div>
+  </div>
+  <div class="copyline wrap">© <span id="yr"></span> Lotus Academy, Chittorgarh. All rights reserved.</div>
+</footer>
+
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+
+<!-- Hamburger menu popup logic -->
+<script>
+(function () {
+  var btn = document.getElementById('menuBtn');
+  var overlay = document.getElementById('menuOverlay');
+  var closeBtn = document.getElementById('menuClose');
+  if (!btn || !overlay) return;
+
+  function openMenu() {
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+    btn.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('menu-open');
+  }
+  function closeMenu() {
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
+  }
+
+  btn.addEventListener('click', function () {
+    overlay.classList.contains('show') ? closeMenu() : openMenu();
+  });
+  closeBtn.addEventListener('click', closeMenu);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeMenu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  overlay.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
+})();
+</script>
+
+<script src="main.js"></script>
+</body>
+</html>
