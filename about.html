@@ -120,7 +120,6 @@
     </a>
     
     <!-- purana nav (khali, hidden) — main.js ke liye element bacha ke rakha hai -->
-    <!-- purana nav (khali, hidden) — main.js ke liye element bacha ke rakha hai -->
     <nav class="main-nav" aria-hidden="true"></nav>
 
     <div class="header-actions">
@@ -143,18 +142,17 @@
       <button class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
     </div>
     <nav>
-      <a href="index.html"><span class="ic"></span>Home</a>
-      <a href="about.html"><span class="ic"></span>About &amp; Principal</a>
-      <a href="staff.html" class="active"><span class="ic"></span>Staff Details</a>
-      <a href="fees.html"><span class="ic"></span>Fees Structure</a>
-      <a href="gallery.html"><span class="ic"></span>Albums</a>
-      <a href="calendar.html"><span class="ic"></span>Calendar</a>
-      <a href="contact.html"><span class="ic"></span>Contact</a>
+      <a href="index.html"><span class="ic">🏠</span>Home</a>
+      <a href="about.html" class="active"><span class="ic">🎓</span>About &amp; Principal</a>
+      <a href="staff.html"><span class="ic">👩‍🏫</span>Staff Details</a>
+      <a href="fees.html"><span class="ic">💰</span>Fees Structure</a>
+      <a href="gallery.html"><span class="ic">🖼️</span>Albums</a>
+      <a href="calendar.html"><span class="ic">📅</span>Calendar</a>
+      <a href="contact.html"><span class="ic">📍</span>Contact</a>
     </nav>
     <a href="tel:+919460327854" class="menu-call">📞 Call: 9460327854</a>
   </div>
 </div>
-</header>
 
 <div class="toran"></div>
 
@@ -244,6 +242,40 @@
 </footer>
 
 <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+
+<!-- Hamburger menu popup logic (YE MISSING THA) -->
+<script>
+(function () {
+  var btn = document.getElementById('menuBtn');
+  var overlay = document.getElementById('menuOverlay');
+  var closeBtn = document.getElementById('menuClose');
+  if (!btn || !overlay) return;
+
+  function openMenu() {
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+    btn.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('menu-open');
+  }
+  function closeMenu() {
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
+  }
+
+  btn.addEventListener('click', function () {
+    overlay.classList.contains('show') ? closeMenu() : openMenu();
+  });
+  closeBtn.addEventListener('click', closeMenu);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeMenu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  overlay.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeMenu); });
+})();
+</script>
+
 <script src="main.js"></script>
 </body>
 </html>
