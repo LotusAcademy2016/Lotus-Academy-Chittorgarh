@@ -13,18 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
     t.appendChild(row);
   });
 
-  // mobile nav toggle
-  var toggle = document.querySelector('.menu-toggle');
-  var nav = document.querySelector('.main-nav');
-  if (toggle && nav) {
-    toggle.addEventListener('click', function () {
-      nav.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', nav.classList.contains('open'));
-    });
-    nav.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () { nav.classList.remove('open'); });
-    });
-  }
+  // NOTE: menu popup ka logic ab har page ke andar inline <script> me hai
+  // (id="menuBtn" / "menuOverlay"). Purana mobile nav toggle yaha se hata diya gaya hai.
 
   // scroll-reveal
   var revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
